@@ -23,7 +23,7 @@ $n->footer();
 
 ******************
 
-That's it, just not some nmap commands/scans wont run because they require root
+That's it, just note some nmap commands/scans wont run because they require root
 So it's up to you to set that up. Running your web server as root on a public system 
 would be a bad idea... 
 
