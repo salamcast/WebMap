@@ -2,7 +2,7 @@
 /**
  * WebMap -> a PHP frontend to nMap
  @author Karl Holz < newaeon _A_ mac _D_ com >
- @link   http://www.salamcast.com
+ @link   http://www.phpclasses.org/package/7550-PHP-Run-nmap-security-audit-tool-from-a-Web-interface.html
  @package WebMap
  @version 1.0
  
@@ -10,7 +10,10 @@
  * This is an update to the code and html with css. 
  * I wanted to to give it an applicaction like feel. 
  * It's now a php class and not a procedural script
- * Uses xhtml output
+ * replaced html tables with div and ul tags, looks right on my iPhone 4
+ * uses xhtml output, this will help with applying xslt templates to suck out the selected data and parse it however you want.
+ * added get processing, the form can be swithed from post to get my seting $n->method='get';
+ * please don't run this on your production servers or servers accessable by the web
  
  * Copyright (c) Feb 2009 Karl Holz <newaeon -at- mac -dot- com>
  * Copyright (c) 2008 Morgan Collins <morgan -at- morcant.com>
@@ -53,19 +56,25 @@ class WebMap
   }
   // checked for xHTML <input />
   $check="checked='CHECKED'";
-  $this->title='PHP-NMAP frontend';
+  $this->title='WebMap - a PHP frontend to nMap';
   $this->dtstamp=date('YmdHms');
   if (is_array($_POST) && count($_POST) > 0) {
     foreach($_POST as $k => $v) {
       $this->$k=$v;
     }
+  } elseif (is_array($_GET) && count($_GET) > 0) {
+    foreach($_GET as $k => $v) {
+      $this->$k=$v;
+    }
   } else {
-    $this->host=$_SERVER['REMOTE_ADDR'];
+    $this->host='192.168.2.0/24';
     $this->connect=$check;
-    $this->tcp_icmp=$check;
+    $this->tcp=$check;
+    $this->method='post';
   }
   /* used with css */
-  $this->tablebgcolor        = '#e1e1e1'; // Table Background Color
+  $this->width="620px";
+  $this->tablebgcolor        = '#e1e1e1'; // Title Background Color
   $this->hostsectioncolor    = '#913a47'; // Host Section Background Color
   $this->scansectioncolor    = '#3c7996'; // Scan Section Background Color
   $this->generalsectioncolor = '#3a914b'; // General Section Background Color
@@ -73,7 +82,6 @@ class WebMap
   if ($this->submit && $this->host) 
   {
    $args = '';
-
    switch ($this->scan_type) 
    {
     case 'connect': $args .= '-sT '; $this->connect=$check; break;
@@ -106,54 +114,44 @@ class WebMap
    }
    if ($this->ident_info)    { 
        $args .= '-I '; 
-       $this->ident_info=$check; 
-       
-       }
+       $this->ident_info=$check;     
+   }
    if ($this->fragmentation) { 
        $args .= '-f '; 
        $this->fragmentation=$check;
-       
-       }
+   }
    if ($this->verbose)       { 
        $args .= '-v '; 
        $this->verbose=$check; 
-       
-       }
+   }
    if ($this->use_port)      { 
        $args .= '-p '.escapeshellarg($this->port_range);
        $this->use_port=$check; 
-       
-       }
+   }
    if ($this->fast_scan)     { 
        $args .= '-F '; 
        $this->fast_scan=$check;
-       
-       }
+   }
    if ($this->use_decoy)     { 
        $args .= '-D '.escapeshellarg($this->decoy_name); 
        $this->use_decoy=$check;
-       
-       }
+   }
    if ($this->use_device)    { 
        $args .= '-e '.escapeshellarg($this->device_name); 
        $this->use_device=$check;
-       
-       }
+   }
    if ($this->dont_resolve)  { 
        $args .= '-n '; 
        $this->dont_resolve=$check; 
-       
-       }
+   }
    if ($this->udp_scan)      { 
        $args .= '-sU ';
        $this->udp_scan=$check; 
-       
-       }
+   }
    if ($this->rpc_scan)      { 
        $args .= '-sR ';
        $this->rpc_scan=$check; 
-       
-       }
+   }
    $this->args=$args .= $this->host_flags.' '.escapeshellarg($this->host);
    return TRUE;
   } else { return FALSE; }
@@ -185,41 +183,71 @@ class WebMap
   * xHTML header, must run footer to colse the document 
   */
  function header() {
-    if (stristr($_SERVER['HTTP_ACCEPT'], "application/xhtml+xml")) {
-      $this->mime="application/xhtml+xml";
-      header("Content-Type: ".  $this->mime);
-      print '<?xml version="1.0" encoding="utf-8"?>';
-    } else {
-      $this->mime="text/html";
-      header("Content-Type: ".  $this->mime);
-    }
-    echo <<<H
+  if (stristr($_SERVER['HTTP_ACCEPT'], "application/xhtml+xml")) {
+   $this->mime="application/xhtml+xml";
+   header("Content-Type: ".  $this->mime);
+   print '<?xml version="1.0" encoding="utf-8"?>';
+  } else {
+   $this->mime="text/html";
+   header("Content-Type: ".  $this->mime);
+  }
+  echo <<<H
 <html xmlns="http://www.w3.org/1999/xhtml" >
  <head>
   <title>$this->title</title>
   <meta http-equiv="Content-Type" content="$this->mime; charset=utf-8" />
   <meta http-equiv="Content-Language" content="en-us" />
   <style type="text/css">
-  .tablebgcolor        { background-color: $this->tablebgcolor; }
-  table.tablebgcolor {
-   border-top-width: 0px;
-   border-right-width: 30px;
-   border-bottom-width: 30px;
-   border-left-width: 0px;
-   width: 550px; 
-   padding: 5px; 
-   cellspacing: 0px;
-/*   text-align: center;*/
+  ul {
+            list-style-type: none; 
+            padding: 3px; 
+            margin: 2px; 
+  }         
+  .tablebgcolor { 
+            background-color: $this->tablebgcolor; 
+            width: $this->width; 
+            padding: 5px;
+            text-align: center; 
   }
-  .hostsectioncolor    { background-color: $this->hostsectioncolor; }
-  .scansectioncolor    { background-color: $this->scansectioncolor; }
-  .generalsectioncolor { background-color: $this->generalsectioncolor; }
+  div.hostsectioncolor    { 
+            background-color: $this->hostsectioncolor;
+            width: $this->width; 
+            padding: 5px; 
+            text-align: center; 
+  }
+  input.host {
+            width: 100px;
+  }
+  input.button {
+            width: 40px;
+  }
+  div.scansectioncolor    { 
+            background-color: $this->scansectioncolor; 
+            height: 230px;
+            width: 200px; 
+            padding: 5px; 
+            float: left;
+  }
+  div.generalsectioncolor { 
+            background-color: $this->generalsectioncolor;
+            width: $this->width; 
+            padding: 5px; 
+            height: 230px;
+  }
+  div.generalsectioncolor div {
+            float: right;
+  }
+  h2 {
+            text-align: center; 
+  }
+  input.gen {
+            width: 110px;
+  }
   </style>
  </head>
  <body>
 H
     ;
-    
  }
  
  function footer() {
@@ -227,7 +255,7 @@ H
  }
  /**
   * run nMap
-  * @param bool $log Logging off by default
+  * @param bool $log Logging off by default since windows mostlikely won't have the tee command
   */
  function run_nmap($log=FALSE) {
     if ($this->submit && $this->host) {
@@ -247,124 +275,59 @@ H
   */
  function __toString() {
     $page=$_SERVER['SCRIPT_NAME'];
-
     return <<<HTML
- <form action="$page" method="post">
- <div class="header-banner" >
-  <font size="+3">$this->title</font>
-  <br/><br/><br/>
+ <form action="$page" method="$this->method">
+ <div class="tablebgcolor" >
+  <h1>$this->title</h1>
  </div>
-
- <table class="tablebgcolor" >
-  <tr class="hostsectioncolor">
-   <td width="100"><b>Host(s) to scan</b>:</td>
-   <td width="200" colspan="2">
-    <input type="text" name="host" size="20" value="$this->host" />
-   </td>
-   <td width="100" align="right">
-    <input type="submit" name="submit" value="Scan"/><input type="reset" value="Clear" />
-   </td>
-  </tr>
-  <tr>
-   <td class="scansectioncolor" ><b>Scan Options</b>:</td>
-   <td width="100" class="generalsectioncolor"></td>
-   <td width="100" class="generalsectioncolor"><b>General Options</b>:</td>
-   <td class="generalsectioncolor"></td>
-  </tr>
-  <tr>
-   <td class="scansectioncolor">
-  <input type="radio" name="scan_type" value="connect" $this->connect /> <span>connect()</span>
-   </td>
-   <td class="generalsectioncolor">
-    <input type="checkbox" name="dont_resolve" $this->dont_resolve /> Don't Resolve
-   </td>
-   <td class="generalsectioncolor">
-    <input type="radio" name="ping_type" value="tcp" $this->tcp /> TCP Ping
-   </td>
-   <td class="generalsectioncolor">
-    <input type="checkbox" name="fragmentation" $this->fragmentation /> Fragmentation
-   </td>
-  </tr>
-  <tr>
-   <td class="scansectioncolor">
-    <input type="radio" name="scan_type" value="syn" $this->syn /> SYN Stealth
-   </td>
-   <td class="generalsectioncolor">
-    <input type="checkbox" name="fast_scan" $this->fast_scan /> Fast Scan
-   </td>
-   <td class="generalsectioncolor">
-    <input type="radio" name="ping_type" value="tcp_icmp" $this->tcp_icmp /> TCP&amp;ICMP Ping
-   </td>
-   <td class="generalsectioncolor"></td>
-  </tr>
-  <tr>
-   <td class="scansectioncolor">
-    <input type="radio" name="scan_type" value="null" $this->null /> NULL Scan
-   </td>
-   <td class="generalsectioncolor">
-    <input type="checkbox" name="verbose" $this->verbose /> Verbose
-   </td>
-   <td class="generalsectioncolor">
-    <input type="radio" name="ping_type" value="icmp" $this->icmp /> ICMP Ping
-   </td>
-   <td class="generalsectioncolor"></td>
-  </tr>
-  <tr>
-   <td class="scansectioncolor">
-    <input type="radio" name="scan_type" value="fin" $this->fin /> FIN Scan
-   </td>
-   <td class="generalsectioncolor">
-    <input type="checkbox" name="udp_scan" $this->udp_scan /> UDP Scan
-   </td>
-   <td class="generalsectioncolor">
-    <input type="radio" name="ping_type" value="none" $this->none /> Don't Ping
-   </td>
-   <td class="generalsectioncolor">
-    <input type="checkbox" name="os_detect" $this->os_detect /> OS Detection
-   </td>
-  </tr>
-   
-  <tr>
-   <td class="scansectioncolor">
-    <input type="radio" name="scan_type" value="xmas" $this->xmas /> XMAS Scan
-   </td>
-   <td class="generalsectioncolor">
-    <input type="checkbox" name="rpc_scan" $this->rpc_scan /> RPC Scan
-   </td>
-   <td class="generalsectioncolor"></td>
-   <td class="generalsectioncolor"></td>
-  </tr>
-  
-  <tr>
-   <td class="scansectioncolor">
-    <input type="radio" name="scan_type" value="ack" $this->ack /> ACK Scan
-   </td>
-    <td class="generalsectioncolor">
-    <input type="checkbox" name="use_port" $this->use_port /> Port Range:
-   </td>
-   <td class="generalsectioncolor">
-    <input type="checkbox" name="use_decoy" $this->use_decoy /> Use Decoy(s):
-   </td>
-   <td class="generalsectioncolor">
-    <input type="checkbox" name="use_device" $this->use_device /> Use Device:
-   </td>
-  </tr>
-
-  <tr>
-   <td class="scansectioncolor">
-    <input type="radio" name="scan_type" value="window" $this->window /> Window Scan
-   </td>
-   <td class="generalsectioncolor">
-    <input type="text" name="port_range" size="10" value='$this->port_range' />
-   </td>
-   <td class="generalsectioncolor">
-    <input type="text" name="decoy_name" size="10" value='$this->decoy_name' />
-   </td>
-   <td class="generalsectioncolor">
-    <input type="text" name="device_name" size="10" value='$this->device_name' />
-   </td>
-  </tr>
- </table>
+ <div class="hostsectioncolor">
+  <b>Host(s) to scan:</b> 
+  <input class="host" type="text" name="host"  value="$this->host" />
+  <input class="button" type="submit" name="submit" value="Scan"/>
+  <input class="button" type="reset" value="Clear" />
+ </div>
+ <div  class="scansectioncolor">
+  <h2>Scan Options:</h2>
+  <ul>
+    <li><input type="radio" name="scan_type" value="connect" $this->connect /> connect()</li>
+    <li><input type="radio" name="scan_type" value="syn" $this->syn /> SYN Stealth </li>
+    <li><input type="radio" name="scan_type" value="null" $this->null /> NULL Scan </li>
+    <li><input type="radio" name="scan_type" value="fin" $this->fin /> FIN Scan</li>
+    <li><input type="radio" name="scan_type" value="xmas" $this->xmas /> XMAS Scan</li>
+    <li><input type="radio" name="scan_type" value="ack" $this->ack /> ACK Scan</li>
+    <li><input type="radio" name="scan_type" value="window" $this->window /> Window Scan</li>
+  </ul>         
+ </div> 
+ <div  class="generalsectioncolor" >
+  <h2>General Options:</h2>
+  <div >
+   <ul> 
+    <li><input type="checkbox" name="use_port" $this->use_port /> Port Range:<br /> <input class="gen" type="text" name="port_range"   value='$this->port_range' /></li>
+    <li><input type="checkbox" name="use_decoy" $this->use_decoy /> Use Decoy(s):<br /> <input class="gen" type="text" name="decoy_name"  value='$this->decoy_name' /></li>
+    <li><input type="checkbox" name="use_device" $this->use_device /> Use Device:<br /> <input class="gen" type="text" name="device_name"  value='$this->device_name' /></li>
+   </ul>
+  </div>
+  <div >
+   <ul>
+    <li><input type="checkbox" name="dont_resolve" $this->dont_resolve /> Don't Resolve</li>
+    <li><input type="checkbox" name="fast_scan" $this->fast_scan /> Fast Scan</li>
+    <li><input type="checkbox" name="verbose" $this->verbose /> Verbose</li>
+    <li><input type="checkbox" name="udp_scan" $this->udp_scan /> UDP Scan</li>
+    <li><input type="checkbox" name="rpc_scan" $this->rpc_scan /> RPC Scan</li>
+    <li><input type="checkbox" name="fragmentation" $this->fragmentation /> Fragmentation</li>
+    <li><input type="checkbox" name="os_detect" $this->os_detect /> OS Detection</li>
+   </ul>
+  </div>            
+  <div>
+   <ul >
+    <li><b>Ping Type:</b></li>
+    <li><input type="radio" name="ping_type" value="tcp" $this->tcp /> TCP Ping</li>
+    <li><input type="radio" name="ping_type" value="tcp_icmp" $this->tcp_icmp /> TCP&amp;ICMP Ping</li>
+    <li><input type="radio" name="ping_type" value="icmp" $this->icmp /> ICMP Ping</li>
+    <li><input type="radio" name="ping_type" value="none" $this->none /> Don't Ping</li>
+   </ul>
+  </div>
+ </div>
 </form>
 HTML
      ;
@@ -374,6 +337,7 @@ HTML
 }
 
 //$n=new WebMap('/opt/local/bin/nmap');
+//$n->method='get';
 //$n->header(); // used for xhtml output
 ////print xhtml form
 //echo $n;
