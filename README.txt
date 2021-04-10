@@ -1,30 +1,22 @@
-Here's a basic setup of this php program
+# WebMap
 
-// add it into your script with require
-require_once 'nmap.cls.php';
+It has been over 8 years since I touched this project and since I'm looking for new job, this looked the perfect app to containerize with Docker while learning it.  I have made some updates to the code, small fixes in the xHTML so it displays cleanly.   I have set the form method to GET, you can bookmark your scans to run them again as needed.
 
-// tell it where nmap is located on your system or it will fail
-$n=new WebMap('/opt/local/bin/nmap');
+This is the originally posted on phpclasses.org and GitHub.
 
-// if you want to use xHTML output, call the header
-$n->header(); // used for xhtml output
+* https://www.phpclasses.org/package/7550-PHP-Run-nmap-security-audit-tool-from-a-Web-interface.html
+* https://github.com/salamcast/WebMap
 
-// This prints the xHTML form
-echo $n;
+## About me
 
-// Runs the nMap scan if the options have been passed with the form
-// set true to log nmap scan, prints when done
-// - tee is used to make log
-$n->run_nmap();
+I'm Abu Khadeejah Karl, a father and husband  I'm a full card member of IATSE Local 58 Toronto Stagehands, I was working for a large AV company before COVID-19 killed the events/hospitality industry in Toronto.  so now I'm looking for full time employment in something Cloud Computing, InfoSec or Python related.  My portfolio links are bellow:
 
-//close xhtml output is required if header() was called
-$n->footer();
+* https://github.com/salamcast
+* https://hub.docker.com/u/binholz
+* https://leetcode.com/salamcast/
+* https://www.kaggle.com/abukhadeejahkarl
 
+## Support my work
 
-******************
-
-That's it, just note some nmap commands/scans wont run because they require root
-So it's up to you to set that up. Running your web server as root on a public system 
-would be a bad idea... 
-
-peace
+* LBC: bFhwBzT2r5jCuvphQBJmX9xLUZoackz1J6
+* PayPal: https://www.paypal.com/paypalme/AbuKhadeejahKarl

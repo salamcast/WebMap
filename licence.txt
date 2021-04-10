@@ -1,5 +1,4 @@
-
- * Copyright (c) Feb 2009 Karl Holz <newaeon -at- mac -dot- com>
+ * Copyright (c) April 2021 Karl Holz <salamcast -at- gmail -dot- com>
  * Copyright (c) 2008 Morgan Collins <morgan -at- morcant.com>
 
  ported from PHP-NMAP v0.2 http://www.morcant.net/projects/php-nmap

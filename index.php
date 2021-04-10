@@ -4,7 +4,7 @@
 WebMap Class demo
  */
 require_once 'nmap.cls.php';
-$n=new WebMap('/opt/local/bin/nmap');
+$n=new WebMap('/usr/bin/nmap');
 $n->header(); // used for xhtml output
 //print xhtml form
 echo $n;
