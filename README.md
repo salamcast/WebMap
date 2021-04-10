@@ -9,7 +9,7 @@ This is the originally posted on phpclasses.org and GitHub.
 
 ## About me
 
-I'm Abu Khadeejah Karl, a father and husband  I'm a full card member of IATSE Local 58 Toronto Stagehands, I was working for a large AV company before COVID-19 killed the events/hospitality industry in Toronto.  so now I'm looking for full time employment in something Cloud Computing, InfoSec or Python related.  My portfolio links are bellow:
+I'm Abu Khadeejah Karl, a father and husband;  I'm a full card member of IATSE Local 58 Toronto Stagehands, I was working for a large AV company before COVID-19 killed the events/hospitality industry in Toronto.  so now I'm looking for full time employment in something Cloud Computing, InfoSec or Python related.  My portfolio links are bellow:
 
 * https://github.com/salamcast
 * https://hub.docker.com/u/binholz
